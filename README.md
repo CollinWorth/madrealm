@@ -7,9 +7,12 @@ bullet patterns, permadeath as the eventual target. Built in **Godot
 
 ## Status
 
-First vertical slice: one playable class (Wizard), one enemy script
-driven entirely by data, object-pooled projectiles, a health HUD, and
-a test arena. No dungeons, loot, or networking yet -- see *Next steps*.
+One playable class (Wizard), one enemy script driven entirely by data
+(4 enemy types across two scenes via different `Stats`/`Pattern`
+resources), object-pooled projectiles, a health HUD, a basic
+item/inventory/pickup loop with a toggleable UI, and a proper dungeon
+room alongside the original test arena. No procedural generation,
+equipment stat bonuses, or networking yet -- see *Next steps*.
 
 **I could not run or compile this locally** -- this machine has neither
 Godot nor the .NET SDK installed, so treat this as carefully
@@ -25,13 +28,17 @@ which I reviewed line-by-line.
 2. Install the .NET SDK (8.0+) if you don't have it.
 3. Open `project.godot` in Godot. It should prompt to build the C#
    project on first open/run -- let it.
-4. Press F5 (or the Play button). `Arena.tscn` is the main scene.
+4. Press F5 (or the Play button). `Dungeon.tscn` is the main scene
+   (`Arena.tscn` is still there too -- the original flat test room,
+   useful for isolated testing without walking into pillars/enemies).
 
 ## Controls
 
 - **WASD** -- move
 - **Mouse** -- aim
 - **Left click (hold)** -- fire, at your class's fire rate (Dexterity-scaled)
+- **I** -- toggle inventory. Click a filled slot to drop that item back
+  into the world at your feet.
 
 Controls are read directly via `Input.IsPhysicalKeyPressed` / mouse
 button state rather than Godot's InputMap, to keep the first pass
@@ -84,6 +91,21 @@ EntityBase state and broadcasts it; client renders it," rather than a
 rewrite. Don't build networking speculatively before you need it --
 just don't undo this separation when you don't have to.
 
+**Items are data too, and Inventory is deliberately not a Node.**
+`ItemResource` follows the same `[GlobalClass] Resource` pattern as
+everything else -- see `resources/items/`. `Inventory` (owned directly
+by `Player`) is a plain C# class with no Godot base class at all: it's
+per-player runtime state with no reason to live in the scene tree, and
+staying a dumb data holder means it doesn't need Godot's signal system
+to be testable in isolation later. `Pickup` and `InventoryUI` both
+fire `EventBus.InventoryChanged` after touching it rather than
+`Inventory` announcing its own changes -- same reasoning as everywhere
+else: the thing holding data doesn't need to know who's listening.
+There's no equip/stat-bonus system yet -- picking things up and
+dropping them via the UI works, but nothing you're holding affects
+your stats yet. That's the natural next step once you want it (see
+*Next steps*).
+
 **Collision layers** (`project.godot` -> Layer Names, mirrored as
 `const uint Layer*` in each script that needs them): `World`,
 `Player`, `Enemy`, `PlayerBullet`, `EnemyBullet`. Bullets only ever
@@ -97,20 +119,22 @@ real level geometry instead of the placeholder open arena.
 
 1. **Verify it actually runs** -- open in Godot, fix whatever typo I
    inevitably have in a hand-written `.tscn`.
-2. **Real art** -- everything currently renders as flat-colored
-   circles via `_Draw()`. Swap for `Sprite2D`/`AnimatedSprite2D` once
+2. **Equipment stat bonuses** -- the inventory loop (pick up / view /
+   drop) works, but nothing you're carrying affects your character
+   yet. Natural next piece: an equipped-item slot (or slots) on
+   Player, and folding their bonus stats into the live `StatsResource`
+   on equip/unequip.
+3. **Real art** -- everything currently renders as flat-colored
+   shapes via `_Draw()`. Swap for `Sprite2D`/`AnimatedSprite2D` once
    you have (or want to place) actual art; the gameplay code doesn't
    care.
-3. **Procedural rooms** -- `Arena.tscn` is one static test room.
-   RotMG's actual structure (Nexus hub + generated dungeon instances)
-   is a real chunk of work; a `TileMap`-based room generator is the
-   next architectural piece worth designing deliberately rather than
-   bolting on.
-4. **More classes/enemies** -- almost entirely `.tres` authoring at
-   this point, per the "everything's data" section above.
-5. **Inventory/equipment** -- an `ItemResource` following the same
-   pattern as `StatsResource`, plus an inventory Node that composes
-   equipped-item stat bonuses onto base `StatsResource` values.
+4. **Procedural rooms** -- `Dungeon.tscn` is still one hand-placed
+   room. RotMG's actual structure (Nexus hub + generated dungeon
+   instances) is a real chunk of work; a `TileMap`-based room
+   generator is the next architectural piece worth designing
+   deliberately rather than bolting on.
+5. **More classes/enemies/items** -- almost entirely `.tres` authoring
+   at this point, per the "everything's data" section above.
 6. **Permadeath + persistence** -- what happens on `PlayerDied`
    (currently just a signal nobody's listening to yet).
 7. **Multiplayer** -- the big one, and genuinely a separate project
