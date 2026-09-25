@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/Enemies/BulletPatternResource.cs" id="1_pattern"]
+
+[resource]
+script = ExtResource("1_pattern")
+BulletCount = 1
+SpreadDegrees = 0.0
+BulletSpeed = 420.0
+BulletLifetime = 2.5
+AimAtPlayer = true
+BulletColor = Color(1, 0.9, 0.2, 1)

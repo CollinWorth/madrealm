@@ -1,0 +1,68 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/World/Arena.cs" id="1_arenascript"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyBase.tscn" id="3_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
+[ext_resource type="Resource" path="res://resources/stats/GruntStats.tres" id="5_gruntstats"]
+[ext_resource type="Resource" path="res://resources/stats/SniperStats.tres" id="6_sniperstats"]
+[ext_resource type="Resource" path="res://resources/patterns/SpreadBurst.tres" id="7_spread"]
+[ext_resource type="Resource" path="res://resources/patterns/AimedSniper.tres" id="8_aimed"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallH"]
+size = Vector2(1280, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallV"]
+size = Vector2(40, 880)
+
+[node name="Arena" type="Node2D"]
+script = ExtResource("1_arenascript")
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="Top" type="StaticBody2D" parent="Walls"]
+position = Vector2(0, -420)
+collision_layer = 1
+collision_mask = 0
+
+[node name="TopShape" type="CollisionShape2D" parent="Walls/Top"]
+shape = SubResource("RectangleShape2D_wallH")
+
+[node name="Bottom" type="StaticBody2D" parent="Walls"]
+position = Vector2(0, 420)
+collision_layer = 1
+collision_mask = 0
+
+[node name="BottomShape" type="CollisionShape2D" parent="Walls/Bottom"]
+shape = SubResource("RectangleShape2D_wallH")
+
+[node name="Left" type="StaticBody2D" parent="Walls"]
+position = Vector2(-620, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="LeftShape" type="CollisionShape2D" parent="Walls/Left"]
+shape = SubResource("RectangleShape2D_wallV")
+
+[node name="Right" type="StaticBody2D" parent="Walls"]
+position = Vector2(620, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="RightShape" type="CollisionShape2D" parent="Walls/Right"]
+shape = SubResource("RectangleShape2D_wallV")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(0, 0)
+
+[node name="Grunt" parent="." instance=ExtResource("3_enemy")]
+position = Vector2(-300, -150)
+Stats = ExtResource("5_gruntstats")
+Pattern = ExtResource("7_spread")
+
+[node name="Sniper" parent="." instance=ExtResource("3_enemy")]
+position = Vector2(300, 150)
+Stats = ExtResource("6_sniperstats")
+Pattern = ExtResource("8_aimed")
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]

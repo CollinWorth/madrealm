@@ -1,0 +1,19 @@
+# Godot 4+ specific ignores
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# .NET / C#
+.mono/
+data_*/
+bin/
+obj/
+*.user
+
+# Mono-specific ignores
+.mono/
+
+# System / editor
+.DS_Store
+*.tmp
