@@ -29,4 +29,7 @@ public partial class EventBus : Node
 
     [Signal]
     public delegate void DamageDealtEventHandler(Node target, int amount, Vector2 atPosition);
+
+    [Signal]
+    public delegate void InventoryChangedEventHandler();
 }

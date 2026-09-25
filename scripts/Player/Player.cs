@@ -1,6 +1,7 @@
 using Godot;
 using MadRealm.Core;
 using MadRealm.Entities;
+using MadRealm.Items;
 using MadRealm.Projectiles;
 
 namespace MadRealm.Player;
@@ -9,6 +10,8 @@ public partial class Player : EntityBase
 {
     [Export] public PlayerClassData ClassData;
     [Export] public PackedScene BulletScene;
+
+    public Inventory Inventory { get; } = new Inventory();
 
     private const uint LayerWorld = 1 << 0;
     private const uint LayerPlayer = 1 << 1;

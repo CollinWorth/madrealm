@@ -98,7 +98,14 @@ public partial class EnemyBase : EntityBase
             float angle = baseAngle;
             if (count > 1)
             {
-                float t = (float)i / (count - 1);
+                // Center each bullet within its own equal slice of the
+                // total spread (rather than spacing by count - 1,
+                // which puts a bullet on each extreme edge). That
+                // alternative breaks for a full 360-degree ring
+                // specifically: the first and last bullets would both
+                // land exactly on the seam, firing two bullets in the
+                // same direction instead of evenly spacing all of them.
+                float t = (i + 0.5f) / count;
                 angle = baseAngle - spreadRad / 2f + spreadRad * t;
             }
 
