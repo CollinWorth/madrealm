@@ -45,7 +45,7 @@ public partial class EnemyBase : EntityBase
     public override void _PhysicsProcess(double delta)
     {
         var player = GameManager.Instance?.CurrentPlayer;
-        if (player == null || !GD.IsInstanceValid(player))
+        if (player == null || !GodotObject.IsInstanceValid(player))
         {
             Velocity = Vector2.Zero;
             MoveAndSlide();
