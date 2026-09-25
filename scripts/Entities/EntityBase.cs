@@ -45,7 +45,7 @@ public partial class EntityBase : CharacterBody2D
             return;
 
         int finalDamage = Stats.ApplyDefense(rawAmount);
-        CurrentHealth = Mathf.Max(0, CurrentHealth - finalDamage);
+        CurrentHealth = System.Math.Max(0, CurrentHealth - finalDamage);
 
         EventBus.Instance.EmitSignal(EventBus.SignalName.DamageDealt, this, finalDamage, GlobalPosition);
         OnHealthChanged();

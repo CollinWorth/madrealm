@@ -32,7 +32,7 @@ public partial class StatsResource : Resource
     public int ApplyDefense(int incomingDamage)
     {
         int reduced = incomingDamage - Defense;
-        int floor = Mathf.Max(1, incomingDamage / 10);
-        return Mathf.Max(floor, reduced);
+        int floor = System.Math.Max(1, incomingDamage / 10);
+        return System.Math.Max(floor, reduced);
     }
 }

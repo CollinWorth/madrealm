@@ -45,7 +45,7 @@ public partial class EnemyBase : EntityBase
     public override void _PhysicsProcess(double delta)
     {
         var player = GameManager.Instance?.CurrentPlayer;
-        if (player == null || !IsInstanceValid(player))
+        if (player == null || !GD.IsInstanceValid(player))
         {
             Velocity = Vector2.Zero;
             MoveAndSlide();
@@ -91,7 +91,7 @@ public partial class EnemyBase : EntityBase
 
         float baseAngle = baseDirection.Angle();
         float spreadRad = Mathf.DegToRad(Pattern.SpreadDegrees);
-        int count = Mathf.Max(1, Pattern.BulletCount);
+        int count = System.Math.Max(1, Pattern.BulletCount);
 
         for (int i = 0; i < count; i++)
         {
