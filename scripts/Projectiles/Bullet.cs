@@ -66,7 +66,12 @@ public partial class Bullet : Area2D
 
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, 4f, _color);
+        // All bullets render white regardless of team/pattern color for
+        // now (easier to see against everything while testing). _color
+        // is still tracked per-shot, so reverting to team/pattern
+        // colors later is just swapping Colors.White back for _color
+        // here -- nothing upstream needs to change.
+        DrawCircle(Vector2.Zero, 4f, Colors.White);
     }
 
     private void OnBodyEntered(Node2D body)

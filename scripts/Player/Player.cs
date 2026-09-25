@@ -43,10 +43,10 @@ public partial class Player : EntityBase
 
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, 14f, Colors.White);
-        DrawCircle(Vector2.Zero, 11f, new Color(0.2f, 0.6f, 1f));
+        DrawCircle(Vector2.Zero, 36f, Colors.White);
+        DrawCircle(Vector2.Zero, 28f, new Color(0.2f, 0.6f, 1f));
         // Facing indicator, drawn along local +X since Rotation is applied by the engine.
-        DrawLine(Vector2.Zero, new Vector2(16f, 0f), Colors.White, 3f);
+        DrawLine(Vector2.Zero, new Vector2(44f, 0f), Colors.White, 5f);
     }
 
     public override void _PhysicsProcess(double delta)

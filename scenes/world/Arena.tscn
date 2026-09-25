@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3]
 
-[ext_resource type="Script" path="res://scripts/World/Arena.cs" id="1_arenascript"]
+[ext_resource type="Script" path="res://scripts/World/FloorBackground.cs" id="1_floorscript"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/EnemyBase.tscn" id="3_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
@@ -17,7 +17,11 @@ size = Vector2(1280, 40)
 size = Vector2(40, 880)
 
 [node name="Arena" type="Node2D"]
-script = ExtResource("1_arenascript")
+
+[node name="Floor" type="Node2D" parent="."]
+script = ExtResource("1_floorscript")
+ArenaSize = Vector2(1200, 800)
+FloorColor = Color(0.08, 0.08, 0.1, 1)
 
 [node name="Walls" type="Node2D" parent="."]
 
