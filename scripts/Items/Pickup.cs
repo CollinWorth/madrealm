@@ -29,9 +29,20 @@ public partial class Pickup : Area2D
 
     public override void _Draw()
     {
-        Color color = Item?.IconColor ?? Colors.White;
-        DrawCircle(Vector2.Zero, 8f, color);
-        DrawCircle(Vector2.Zero, 8f, Colors.Black, false, 2f);
+        if (Item?.Icon != null)
+        {
+            var rect = new Rect2(new Vector2(-12f, -12f), new Vector2(24f, 24f));
+            DrawTextureRect(Item.Icon, rect, false, Colors.White);
+        }
+        else
+        {
+            // No real art assigned for this item yet -- flat colored
+            // circle instead. Not an error state, just the fallback
+            // every item used before icons existed at all.
+            Color color = Item?.IconColor ?? Colors.White;
+            DrawCircle(Vector2.Zero, 8f, color);
+            DrawCircle(Vector2.Zero, 8f, Colors.Black, false, 2f);
+        }
     }
 
     private void OnBodyEntered(Node2D body)

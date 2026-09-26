@@ -1,11 +1,16 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player/Player.cs" id="1_script"]
 [ext_resource type="Resource" path="res://resources/classes/Wizard.tres" id="2_class"]
 [ext_resource type="PackedScene" path="res://scenes/projectiles/Bullet.tscn" id="3_bullet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/characters.png" id="4_sheet"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 30.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_player"]
+atlas = ExtResource("4_sheet")
+region = Rect2(80, 0, 16, 24)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_script")
@@ -14,6 +19,10 @@ BulletScene = ExtResource("3_bullet")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_player")
+
+[node name="CharacterSprite" type="Sprite2D" parent="."]
+scale = Vector2(2.5, 2.5)
+texture = SubResource("AtlasTexture_player")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.5, 0.5)

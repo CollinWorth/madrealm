@@ -16,6 +16,20 @@ public partial class Player : EntityBase
     private const uint LayerWorld = 1 << 0;
     private const uint LayerPlayer = 1 << 1;
 
+    // Character sheet cell size and which column to use (column 5 =
+    // "new style" blue character). Sheet layout: rows 0/1 = facing
+    // down, 2/3 = facing sideways (drawn facing left; mirrored via
+    // FlipH for right), 4/5 = facing away/up, each pair being a
+    // 2-frame walk cycle -- only the first frame of each pair (0/2/4)
+    // is used for now, see docs/art-integration-plan.md for the
+    // walk-animation follow-up.
+    private const int SpriteCellWidth = 16;
+    private const int SpriteCellHeight = 24;
+    private const int SpriteColumn = 5;
+
+    private Sprite2D _sprite;
+    private AtlasTexture _spriteAtlas;
+    private float _aimAngle;
     private float _shotTimer;
 
     public override void _Ready()
@@ -58,17 +72,25 @@ public partial class Player : EntityBase
         CollisionLayer = LayerPlayer;
         CollisionMask = LayerWorld;
 
+        _sprite = GetNode<Sprite2D>("CharacterSprite");
+        _spriteAtlas = (AtlasTexture)_sprite.Texture;
+
         GameManager.Instance.CurrentPlayer = this;
         OnHealthChanged();
         QueueRedraw();
     }
 
+    // The character sheet is drawn for 4 discrete facing directions,
+    // not continuous rotation -- unlike the old placeholder circle,
+    // it would look wrong spinning to track the mouse at arbitrary
+    // angles. So CharacterSprite (a child of this node) is never
+    // rotated; only this thin aim-line is, via _aimAngle directly
+    // rather than the node's own Rotation (which stays 0 so the
+    // sprite child inherits no rotation from its parent).
     public override void _Draw()
     {
-        DrawCircle(Vector2.Zero, 36f, Colors.White);
-        DrawCircle(Vector2.Zero, 28f, new Color(0.2f, 0.6f, 1f));
-        // Facing indicator, drawn along local +X since Rotation is applied by the engine.
-        DrawLine(Vector2.Zero, new Vector2(44f, 0f), Colors.White, 5f);
+        Vector2 aimDir = Vector2.Right.Rotated(_aimAngle);
+        DrawLine(aimDir * 20f, aimDir * 46f, Colors.White, 4f);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -93,8 +115,35 @@ public partial class Player : EntityBase
     private void HandleAiming()
     {
         Vector2 toMouse = GetGlobalMousePosition() - GlobalPosition;
-        if (toMouse.LengthSquared() > 1f)
-            Rotation = toMouse.Angle();
+        if (toMouse.LengthSquared() <= 1f)
+            return;
+
+        _aimAngle = toMouse.Angle();
+        UpdateFacing(toMouse);
+        QueueRedraw();
+    }
+
+    // Picks one of the sheet's 3 direction rows (down/side/up) by
+    // whichever axis dominates the aim vector, mirroring the single
+    // side-facing pose for right vs. left instead of needing a
+    // separate right-facing frame that doesn't exist on the sheet.
+    private void UpdateFacing(Vector2 direction)
+    {
+        if (Mathf.Abs(direction.X) > Mathf.Abs(direction.Y))
+        {
+            _spriteAtlas.Region = new Rect2(SpriteColumn * SpriteCellWidth, 2 * SpriteCellHeight, SpriteCellWidth, SpriteCellHeight);
+            _sprite.FlipH = direction.X > 0f;
+        }
+        else if (direction.Y > 0f)
+        {
+            _spriteAtlas.Region = new Rect2(SpriteColumn * SpriteCellWidth, 0 * SpriteCellHeight, SpriteCellWidth, SpriteCellHeight);
+            _sprite.FlipH = false;
+        }
+        else
+        {
+            _spriteAtlas.Region = new Rect2(SpriteColumn * SpriteCellWidth, 4 * SpriteCellHeight, SpriteCellWidth, SpriteCellHeight);
+            _sprite.FlipH = false;
+        }
     }
 
     private void HandleShooting(float delta)
@@ -116,7 +165,7 @@ public partial class Player : EntityBase
             return;
 
         var bullet = ObjectPool.Instance.Get<Bullet>(BulletScene);
-        Vector2 direction = Vector2.Right.Rotated(Rotation);
+        Vector2 direction = Vector2.Right.Rotated(_aimAngle);
         Color color = ClassData?.ProjectileColor ?? Colors.Cyan;
         float speed = ClassData?.ProjectileSpeed ?? 600f;
         float lifetime = ClassData?.ProjectileLifetime ?? 1.2f;

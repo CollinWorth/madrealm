@@ -27,6 +27,10 @@ BulletPool="*res://scripts/Core/ObjectPool.cs"
 
 project/assembly_name="MadRealm"
 
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+
 [layer_names]
 
 2d_physics/layer_1="World"

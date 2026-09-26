@@ -23,4 +23,11 @@ public partial class ItemResource : Resource
     [Export] public ItemType Kind = ItemType.Consumable;
     [Export] public Color IconColor = Colors.White;
     [Export] public string Description = "";
+
+    // Optional real icon (an AtlasTexture region of a shared sprite
+    // sheet -- see resources/items/*.tres for examples). Null is a
+    // valid, supported state: Pickup falls back to drawing IconColor
+    // as a plain circle when Icon isn't set, so existing/new items
+    // don't need art before they're usable.
+    [Export] public Texture2D Icon;
 }
