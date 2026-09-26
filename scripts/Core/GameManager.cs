@@ -24,6 +24,7 @@ public partial class GameManager : Node
     public StatsResource PendingStats { get; set; }
     public int PendingHealth { get; set; } = -1;
     public Inventory PendingInventory { get; set; }
+    public Equipment PendingEquipment { get; set; }
 
     public override void _Ready()
     {

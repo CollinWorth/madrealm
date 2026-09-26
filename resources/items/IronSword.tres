@@ -14,3 +14,4 @@ Kind = 0
 IconColor = Color(0.75, 0.75, 0.8, 1)
 Description = "A basic blade. Better than fists."
 Icon = SubResource("AtlasTexture_ironsword")
+BonusAttack = 5

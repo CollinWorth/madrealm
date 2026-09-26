@@ -38,4 +38,17 @@ public class Inventory
         _slots[index] = null;
         return item;
     }
+
+    // Used specifically by equip/unequip to put an item back in the
+    // exact slot it came from (rather than TryAdd's "first empty
+    // slot"), so swapping gear is always net-neutral on slot count
+    // and can never fail due to a full inventory. item may be null
+    // (clearing a slot).
+    public void SetSlot(int index, ItemResource item)
+    {
+        if (index < 0 || index >= Size)
+            return;
+
+        _slots[index] = item;
+    }
 }

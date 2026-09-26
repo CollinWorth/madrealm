@@ -43,6 +43,7 @@ public partial class Portal : Area2D
         GameManager.Instance.PendingStats = player.Stats;
         GameManager.Instance.PendingHealth = player.CurrentHealth;
         GameManager.Instance.PendingInventory = player.Inventory;
+        GameManager.Instance.PendingEquipment = player.Equipment;
 
         GetTree().ChangeSceneToFile(DestinationScenePath);
     }

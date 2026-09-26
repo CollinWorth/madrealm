@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/UI/InventoryUI.cs" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/items/Pickup.tscn" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/UI/InventorySlotButton.cs" id="3_slotscript"]
+[ext_resource type="Script" path="res://scripts/UI/EquipmentSlotButton.cs" id="4_equipslotscript"]
 
 [node name="InventoryUI" type="CanvasLayer"]
 script = ExtResource("1_script")
@@ -10,13 +12,73 @@ PickupScene = ExtResource("2_pickup")
 [node name="Panel" type="Panel" parent="."]
 offset_left = 20.0
 offset_top = 60.0
-offset_right = 300.0
-offset_bottom = 224.0
+offset_right = 610.0
+offset_bottom = 310.0
 
-[node name="Grid" type="GridContainer" parent="Panel"]
+[node name="HealthBar" type="ProgressBar" parent="Panel"]
 offset_left = 10.0
 offset_top = 10.0
+offset_right = 280.0
+offset_bottom = 34.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="Panel/HealthBar"]
 offset_right = 270.0
+offset_bottom = 24.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "100 / 100"
+
+[node name="StatsBox" type="VBoxContainer" parent="Panel"]
+offset_left = 10.0
+offset_top = 44.0
+offset_right = 280.0
+offset_bottom = 224.0
+
+[node name="AttackLabel" type="Label" parent="Panel/StatsBox"]
+text = "Attack: 0"
+
+[node name="DefenseLabel" type="Label" parent="Panel/StatsBox"]
+text = "Defense: 0"
+
+[node name="SpeedLabel" type="Label" parent="Panel/StatsBox"]
+text = "Speed: 0"
+
+[node name="DexterityLabel" type="Label" parent="Panel/StatsBox"]
+text = "Dexterity: 0"
+
+[node name="VitalityLabel" type="Label" parent="Panel/StatsBox"]
+text = "Vitality: 0"
+
+[node name="WisdomLabel" type="Label" parent="Panel/StatsBox"]
+text = "Wisdom: 0"
+
+[node name="GearBox" type="HBoxContainer" parent="Panel"]
+offset_left = 10.0
+offset_top = 234.0
+offset_right = 280.0
+offset_bottom = 294.0
+theme_override_constants/separation = 8
+
+[node name="WeaponSlot" type="Button" parent="Panel/GearBox"]
+custom_minimum_size = Vector2(56, 56)
+script = ExtResource("4_equipslotscript")
+SlotKind = 0
+
+[node name="ArmorSlot" type="Button" parent="Panel/GearBox"]
+custom_minimum_size = Vector2(56, 56)
+script = ExtResource("4_equipslotscript")
+SlotKind = 1
+
+[node name="RingSlot" type="Button" parent="Panel/GearBox"]
+custom_minimum_size = Vector2(56, 56)
+script = ExtResource("4_equipslotscript")
+SlotKind = 2
+
+[node name="Grid" type="GridContainer" parent="Panel"]
+offset_left = 310.0
+offset_top = 10.0
+offset_right = 590.0
 offset_bottom = 154.0
 columns = 4
 theme_override_constants/h_separation = 8
@@ -24,24 +86,32 @@ theme_override_constants/v_separation = 8
 
 [node name="Slot0" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot1" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot2" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot3" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot4" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot5" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot6" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")
 
 [node name="Slot7" type="Button" parent="Panel/Grid"]
 custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_slotscript")

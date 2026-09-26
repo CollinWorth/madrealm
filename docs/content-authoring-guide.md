@@ -55,7 +55,13 @@ Copy `resources/patterns/SpreadBurst.tres` or `AimedSniper.tres`. Fields on `Bul
 
 Whoever's holding the item presses the number key matching its slot (1-8, left-to-right/top-to-bottom in the inventory grid) to trigger it — see `Player.UseItemAt()` / `Player._UnhandledInput()`. `HealthPotion.tres` (Heal) and `VitalityPotion.tres` (BoostVitality) are worked examples of both effect shapes.
 
-**Gear (Weapon/Armor/Ring) doesn't do anything yet beyond sitting in inventory and, now, being hotkey-safe** (pressing a number on a `Effect = None` slot just no-ops). Actual equip slots and passive stat bonuses from worn gear are still the next real system to build — see `README.md` Next Steps. Don't assume equipping/wearing an item does anything yet; only the explicit `Effect` mechanism above currently touches player state.
+**Make gear (Weapon/Armor/Ring) actually do something when worn** by setting `Bonus*` fields on `ItemResource` — one per `StatsResource` field, all defaulting to `0`:
+
+`BonusMaxHP`, `BonusMaxMP`, `BonusAttack`, `BonusDefense`, `BonusSpeed`, `BonusDexterity`, `BonusVitality`, `BonusWisdom`.
+
+These are **added while equipped and precisely subtracted on unequip** (`Player.ApplyGearBonus()` / `RemoveGearBonus()`) — not a permanent change like a `Boost*` potion effect. A player drags a Weapon/Armor/Ring-`Kind` item from an inventory slot onto the matching equipment slot in the character panel (`Player.EquipFromInventory()`, wired up via `InventorySlotButton`/`EquipmentSlotButton`'s drag-and-drop); whatever was equipped there before goes back into the exact inventory slot the new item came from, so equipping can never fail due to a full inventory. `IronSword.tres` (+5 Attack), `LeatherArmor.tres` (+3 Defense), and `RubyRing.tres` (+3 Wisdom) are worked examples, one per slot type.
+
+Only one item per slot type at a time (no dual-wield, no multiple rings) — there's exactly one `Weapon`/`Armor`/`Ring` slot on `Equipment`, matching `ItemType` 1:1 minus `Consumable`. There's no explicit "unequip to empty hands" gesture yet; dragging a different item of the same `Kind` swaps it, which covers the practical need without one.
 
 ## Add a new room/scene
 

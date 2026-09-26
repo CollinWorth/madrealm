@@ -16,15 +16,18 @@ One playable class (Wizard) with a real directional sprite, one enemy
 script driven entirely by data (4 enemy types across three scenes via
 different `Stats`/`Pattern` resources, several of those patterns
 reused across different enemy archetypes), object-pooled projectiles,
-a health HUD, an item/inventory/pickup loop with a toggleable UI and
-1-8 hotkeys to use consumables (instant heals and permanent stat
-boosts both supported -- see `docs/content-authoring-guide.md`), two
-connected dungeons plus the original test arena, and portals carrying
-player state between scenes. Item icons and the player sprite use real
-art now; enemies, bullets, and the floor/walls are still flat-colored
-placeholders -- see `docs/art-integration-plan.md`.
-No procedural generation, equipment/gear stat bonuses, or networking
-yet -- see *Next steps*.
+Vitality-scaled passive HP regen, a full character panel (stats,
+health bar, and drag-and-drop equipment slots) alongside the
+inventory grid, 1-8 hotkeys to use consumables (instant heals and
+permanent stat boosts both supported), real equippable gear with
+stat bonuses that apply/remove cleanly on equip/swap -- see
+`docs/content-authoring-guide.md` for both systems -- two connected
+dungeons plus the original test arena, and portals carrying full
+player state (stats, health, inventory, *and* equipment) between
+scenes. Item icons and the player sprite use real art now; enemies,
+bullets, and the floor/walls are still flat-colored placeholders --
+see `docs/art-integration-plan.md`.
+No procedural generation or networking yet -- see *Next steps*.
 
 **This has been built and played for real**, not just reviewed --
 including finding and fixing several genuine bugs along the way (a
@@ -57,6 +60,10 @@ which I reviewed line-by-line.
 - **1-8** -- use the item in that inventory slot (potions etc.), if it
   has a usable effect. Works anytime, doesn't require the inventory
   panel to be open.
+- Drag a Weapon/Armor/Ring from the inventory grid onto the matching
+  slot in the character panel (visible while inventory is open) to
+  equip it and apply its stat bonus. Drag a different item of the
+  same type onto an occupied slot to swap.
 
 Controls are read directly via `Input.IsPhysicalKeyPressed` / mouse
 button state rather than Godot's InputMap, to keep the first pass

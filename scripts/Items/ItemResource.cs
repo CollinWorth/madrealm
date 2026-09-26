@@ -63,4 +63,25 @@ public partial class ItemResource : Resource
     [Export] public ItemEffectType Effect = ItemEffectType.None;
     [Export] public int EffectAmount = 0;
     [Export] public bool ConsumedOnUse = true;
+
+    // Passive bonuses applied while this item is equipped (Weapon/
+    // Armor/Ring only -- see Equipment.cs / Player.EquipFromInventory).
+    // All default 0 deliberately, unlike StatsResource's meaningful
+    // base-stat defaults: these are deltas added on top of base
+    // stats, not a base block themselves, so an item that doesn't
+    // specify a bonus should contribute nothing, not a full stat
+    // line's worth of defaults. Kept as flat fields directly on
+    // ItemResource rather than reusing StatsResource as a "bonus
+    // resource" for exactly that reason -- reusing it would mean
+    // every gear .tres has to remember to zero out every field it
+    // doesn't mean to boost, which is exactly the kind of mistake
+    // that's easy to make once and annoying to track down.
+    [Export] public int BonusMaxHP = 0;
+    [Export] public int BonusMaxMP = 0;
+    [Export] public int BonusAttack = 0;
+    [Export] public int BonusDefense = 0;
+    [Export] public int BonusSpeed = 0;
+    [Export] public int BonusDexterity = 0;
+    [Export] public int BonusVitality = 0;
+    [Export] public int BonusWisdom = 0;
 }

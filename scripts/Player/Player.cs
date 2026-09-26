@@ -12,6 +12,14 @@ public partial class Player : EntityBase
 	[Export] public PackedScene BulletScene;
 
 	public Inventory Inventory { get; set; } = new Inventory();
+	public Equipment Equipment { get; set; } = new Equipment();
+
+	// Tuned by feel, not a real formula -- see docs/architecture.md if
+	// this needs to match a specific design target later. Vitality=10
+	// (a typical starting value) heals ~2 HP/sec; the Wizard's 15
+	// heals ~3 HP/sec.
+	private const float RegenPerVitalityPerSecond = 0.2f;
+	private float _regenAccumulator;
 
 	private const uint LayerWorld = 1 << 0;
 	private const uint LayerPlayer = 1 << 1;
@@ -56,6 +64,7 @@ public partial class Player : EntityBase
 		{
 			Stats = GameManager.Instance.PendingStats;
 			Inventory = GameManager.Instance.PendingInventory ?? Inventory;
+			Equipment = GameManager.Instance.PendingEquipment ?? Equipment;
 		}
 		// Duplicate, don't reference, the class's base stats -- this
 		// Resource is about to become this specific player's live,
@@ -78,6 +87,7 @@ public partial class Player : EntityBase
 			GameManager.Instance.PendingStats = null;
 			GameManager.Instance.PendingHealth = -1;
 			GameManager.Instance.PendingInventory = null;
+			GameManager.Instance.PendingEquipment = null;
 		}
 
 		CollisionLayer = LayerPlayer;
@@ -109,6 +119,29 @@ public partial class Player : EntityBase
 		HandleMovement();
 		HandleAiming();
 		HandleShooting((float)delta);
+		HandleRegen((float)delta);
+	}
+
+	// Accumulates fractional regen (CurrentHealth is an int, Vitality-
+	// scaled regen per frame usually isn't a whole number) and only
+	// applies -- and only fires OnHealthChanged -- once a whole point
+	// is actually banked, rather than every single frame.
+	private void HandleRegen(float delta)
+	{
+		if (CurrentHealth >= Stats.MaxHP)
+		{
+			_regenAccumulator = 0f;
+			return;
+		}
+
+		_regenAccumulator += Stats.Vitality * RegenPerVitalityPerSecond * delta;
+		if (_regenAccumulator < 1f)
+			return;
+
+		int wholePoints = (int)_regenAccumulator;
+		_regenAccumulator -= wholePoints;
+		CurrentHealth = System.Math.Min(Stats.MaxHP, CurrentHealth + wholePoints);
+		OnHealthChanged();
 	}
 
 	// Edge-triggered (Pressed && !Echo), not polled in _PhysicsProcess
@@ -187,6 +220,70 @@ public partial class Player : EntityBase
 		}
 
 		EventBus.Instance.EmitSignal(EventBus.SignalName.PlayerStatsChanged);
+	}
+
+	// Equips the item sitting in the given Inventory slot, if it's
+	// gear (Weapon/Armor/Ring). Whatever was previously equipped in
+	// that slot (if anything) goes back into the exact inventory slot
+	// index the new item just vacated -- net-neutral on slot count,
+	// so this can never fail due to a full inventory the way a
+	// generic TryAdd() could. Consumables aren't equippable here;
+	// they only ever go through UseItemAt.
+	public void EquipFromInventory(int inventorySlotIndex)
+	{
+		var newItem = Inventory.GetSlot(inventorySlotIndex);
+		if (newItem == null)
+			return;
+
+		if (newItem.Kind != ItemType.Weapon && newItem.Kind != ItemType.Armor && newItem.Kind != ItemType.Ring)
+			return;
+
+		var previousItem = Equipment.GetSlot(newItem.Kind);
+		if (previousItem != null)
+			RemoveGearBonus(previousItem);
+
+		Equipment.SetSlot(newItem.Kind, newItem);
+		ApplyGearBonus(newItem);
+
+		Inventory.SetSlot(inventorySlotIndex, previousItem);
+
+		EventBus.Instance.EmitSignal(EventBus.SignalName.InventoryChanged);
+		EventBus.Instance.EmitSignal(EventBus.SignalName.PlayerStatsChanged);
+	}
+
+	// Adds every Bonus* field on the item straight onto the live
+	// Stats resource. Safe to call repeatedly with different items --
+	// each equip/unequip pair is a precise add then subtract of the
+	// exact same numbers, so stacking never drifts.
+	private void ApplyGearBonus(ItemResource item)
+	{
+		Stats.MaxHP += item.BonusMaxHP;
+		Stats.MaxMP += item.BonusMaxMP;
+		Stats.Attack += item.BonusAttack;
+		Stats.Defense += item.BonusDefense;
+		Stats.Speed += item.BonusSpeed;
+		Stats.Dexterity += item.BonusDexterity;
+		Stats.Vitality += item.BonusVitality;
+		Stats.Wisdom += item.BonusWisdom;
+		CurrentHealth = System.Math.Min(CurrentHealth, Stats.MaxHP);
+		OnHealthChanged();
+	}
+
+	// Mirror of ApplyGearBonus. The CurrentHealth clamp matters here
+	// specifically: unequipping a +MaxHP item can drop MaxHP below
+	// whatever CurrentHealth currently is.
+	private void RemoveGearBonus(ItemResource item)
+	{
+		Stats.MaxHP -= item.BonusMaxHP;
+		Stats.MaxMP -= item.BonusMaxMP;
+		Stats.Attack -= item.BonusAttack;
+		Stats.Defense -= item.BonusDefense;
+		Stats.Speed -= item.BonusSpeed;
+		Stats.Dexterity -= item.BonusDexterity;
+		Stats.Vitality -= item.BonusVitality;
+		Stats.Wisdom -= item.BonusWisdom;
+		CurrentHealth = System.Math.Min(CurrentHealth, Stats.MaxHP);
+		OnHealthChanged();
 	}
 
 	private void HandleMovement()
