@@ -1,7 +1,8 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/World/FloorBackground.cs" id="1_floorscript"]
 [ext_resource type="Script" path="res://scripts/World/Obstacle.cs" id="17_obstacle"]
+[ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/EnemyBase.tscn" id="3_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
@@ -134,6 +135,10 @@ Item = ExtResource("15_ringitem")
 [node name="PotionPickup" parent="." instance=ExtResource("6_pickup")]
 position = Vector2(-150, 100)
 Item = ExtResource("16_potion")
+
+[node name="PortalToCatacombs" parent="." instance=ExtResource("18_portal")]
+position = Vector2(0, -440)
+DestinationScenePath = "res://scenes/world/Catacombs.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 

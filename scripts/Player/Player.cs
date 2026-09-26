@@ -11,7 +11,7 @@ public partial class Player : EntityBase
     [Export] public PlayerClassData ClassData;
     [Export] public PackedScene BulletScene;
 
-    public Inventory Inventory { get; } = new Inventory();
+    public Inventory Inventory { get; set; } = new Inventory();
 
     private const uint LayerWorld = 1 << 0;
     private const uint LayerPlayer = 1 << 1;
@@ -22,16 +22,38 @@ public partial class Player : EntityBase
     {
         Team = Faction.Player;
 
+        // Arriving via a portal: adopt the stats/inventory Portal saved
+        // on GameManager instead of building fresh ones from ClassData.
+        // This is already this player's own duplicated Stats instance
+        // from before the trip, so no further Duplicate() needed here.
+        bool arrivedViaPortal = GameManager.Instance?.PendingStats != null;
+        if (arrivedViaPortal)
+        {
+            Stats = GameManager.Instance.PendingStats;
+            Inventory = GameManager.Instance.PendingInventory ?? Inventory;
+        }
         // Duplicate, don't reference, the class's base stats -- this
         // Resource is about to become this specific player's live,
         // mutable HP/stat state. Without Duplicate(), every player
         // using the same class would share (and stomp) one Resource
         // instance, since Godot Resources are reference types by
         // default.
-        if (ClassData?.BaseStats != null)
+        else if (ClassData?.BaseStats != null)
+        {
             Stats = (StatsResource)ClassData.BaseStats.Duplicate();
+        }
 
         base._Ready();
+
+        if (arrivedViaPortal && GameManager.Instance.PendingHealth >= 0)
+            CurrentHealth = GameManager.Instance.PendingHealth;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PendingStats = null;
+            GameManager.Instance.PendingHealth = -1;
+            GameManager.Instance.PendingInventory = null;
+        }
 
         CollisionLayer = LayerPlayer;
         CollisionMask = LayerWorld;

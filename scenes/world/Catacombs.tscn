@@ -1,0 +1,107 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/World/FloorBackground.cs" id="1_floorscript"]
+[ext_resource type="Script" path="res://scripts/World/Obstacle.cs" id="2_obstacle"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyBase.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryUI.tscn" id="6_invui"]
+[ext_resource type="PackedScene" path="res://scenes/items/Pickup.tscn" id="7_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="8_portal"]
+[ext_resource type="Resource" path="res://resources/stats/GruntStats.tres" id="9_gruntstats"]
+[ext_resource type="Resource" path="res://resources/stats/SniperStats.tres" id="10_sniperstats"]
+[ext_resource type="Resource" path="res://resources/stats/RingCasterStats.tres" id="11_ringstats"]
+[ext_resource type="Resource" path="res://resources/patterns/SpreadBurst.tres" id="12_spread"]
+[ext_resource type="Resource" path="res://resources/patterns/AimedSniper.tres" id="13_aimed"]
+[ext_resource type="Resource" path="res://resources/patterns/RingBurst.tres" id="14_ringpattern"]
+[ext_resource type="Resource" path="res://resources/items/RubyRing.tres" id="15_ringitem"]
+[ext_resource type="Resource" path="res://resources/items/LeatherArmor.tres" id="16_armor"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallH"]
+size = Vector2(1440, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallV"]
+size = Vector2(40, 940)
+
+[node name="Catacombs" type="Node2D"]
+
+[node name="Floor" type="Node2D" parent="."]
+script = ExtResource("1_floorscript")
+ArenaSize = Vector2(1400, 900)
+FloorColor = Color(0.05, 0.07, 0.06, 1)
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="Top" type="StaticBody2D" parent="Walls"]
+position = Vector2(0, -470)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("2_obstacle")
+RectSize = Vector2(1440, 40)
+
+[node name="TopShape" type="CollisionShape2D" parent="Walls/Top"]
+shape = SubResource("RectangleShape2D_wallH")
+
+[node name="Bottom" type="StaticBody2D" parent="Walls"]
+position = Vector2(0, 470)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("2_obstacle")
+RectSize = Vector2(1440, 40)
+
+[node name="BottomShape" type="CollisionShape2D" parent="Walls/Bottom"]
+shape = SubResource("RectangleShape2D_wallH")
+
+[node name="Left" type="StaticBody2D" parent="Walls"]
+position = Vector2(-720, 0)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("2_obstacle")
+RectSize = Vector2(40, 940)
+
+[node name="LeftShape" type="CollisionShape2D" parent="Walls/Left"]
+shape = SubResource("RectangleShape2D_wallV")
+
+[node name="Right" type="StaticBody2D" parent="Walls"]
+position = Vector2(720, 0)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("2_obstacle")
+RectSize = Vector2(40, 940)
+
+[node name="RightShape" type="CollisionShape2D" parent="Walls/Right"]
+shape = SubResource("RectangleShape2D_wallV")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(0, 350)
+
+[node name="Grunt2" parent="." instance=ExtResource("4_enemy")]
+position = Vector2(-350, -180)
+Stats = ExtResource("9_gruntstats")
+Pattern = ExtResource("12_spread")
+
+[node name="Sniper2" parent="." instance=ExtResource("4_enemy")]
+position = Vector2(350, -180)
+Stats = ExtResource("10_sniperstats")
+Pattern = ExtResource("13_aimed")
+
+[node name="RingCaster2" parent="." instance=ExtResource("4_enemy")]
+position = Vector2(0, -50)
+Stats = ExtResource("11_ringstats")
+Pattern = ExtResource("14_ringpattern")
+
+[node name="RingPickup" parent="." instance=ExtResource("7_pickup")]
+position = Vector2(-200, 100)
+Item = ExtResource("15_ringitem")
+
+[node name="ArmorPickup" parent="." instance=ExtResource("7_pickup")]
+position = Vector2(200, 100)
+Item = ExtResource("16_armor")
+
+[node name="PortalToDungeon" parent="." instance=ExtResource("8_portal")]
+position = Vector2(0, -390)
+DestinationScenePath = "res://scenes/world/Dungeon.tscn"
+
+[node name="HUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="InventoryUI" parent="." instance=ExtResource("6_invui")]
