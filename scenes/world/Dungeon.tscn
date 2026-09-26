@@ -1,6 +1,7 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/World/FloorBackground.cs" id="1_floorscript"]
+[ext_resource type="Script" path="res://scripts/World/Obstacle.cs" id="17_obstacle"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/EnemyBase.tscn" id="3_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
@@ -39,6 +40,8 @@ FloorColor = Color(0.06, 0.05, 0.08, 1)
 position = Vector2(0, -520)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+RectSize = Vector2(1680, 40)
 
 [node name="TopShape" type="CollisionShape2D" parent="Walls/Top"]
 shape = SubResource("RectangleShape2D_wallH")
@@ -47,6 +50,8 @@ shape = SubResource("RectangleShape2D_wallH")
 position = Vector2(0, 520)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+RectSize = Vector2(1680, 40)
 
 [node name="BottomShape" type="CollisionShape2D" parent="Walls/Bottom"]
 shape = SubResource("RectangleShape2D_wallH")
@@ -55,6 +60,8 @@ shape = SubResource("RectangleShape2D_wallH")
 position = Vector2(-820, 0)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+RectSize = Vector2(40, 1080)
 
 [node name="LeftShape" type="CollisionShape2D" parent="Walls/Left"]
 shape = SubResource("RectangleShape2D_wallV")
@@ -63,6 +70,8 @@ shape = SubResource("RectangleShape2D_wallV")
 position = Vector2(820, 0)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+RectSize = Vector2(40, 1080)
 
 [node name="RightShape" type="CollisionShape2D" parent="Walls/Right"]
 shape = SubResource("RectangleShape2D_wallV")
@@ -71,6 +80,8 @@ shape = SubResource("RectangleShape2D_wallV")
 position = Vector2(-200, 0)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+CircleRadius = 40.0
 
 [node name="PillarLeftShape" type="CollisionShape2D" parent="Walls/PillarLeft"]
 shape = SubResource("CircleShape2D_pillar")
@@ -79,6 +90,8 @@ shape = SubResource("CircleShape2D_pillar")
 position = Vector2(200, 0)
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("17_obstacle")
+CircleRadius = 40.0
 
 [node name="PillarRightShape" type="CollisionShape2D" parent="Walls/PillarRight"]
 shape = SubResource("CircleShape2D_pillar")
