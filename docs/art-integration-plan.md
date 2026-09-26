@@ -25,7 +25,7 @@ Four sheets, dropped in and organized under `assets/sprites/`. See `assets/ATTRI
 
 **Only the first frame of each direction pair is used** (rows 0/2/4, not 1/3/5) -- no walk-cycle animation yet, the character is static per-direction. See *Next up* below.
 
-**Items** (`ItemResource.cs` + `Pickup.cs` + the four existing `.tres` files): `ItemResource` gained an `[Export] public Texture2D Icon` field, defaulting to `null`. `Pickup._Draw()` draws the icon via `DrawTextureRect` when set, falling back to the original flat-color circle when not -- so items without art assigned yet are still fully functional, just plainer. All four existing items now have real icons:
+**Items** (`ItemResource.cs` + `Pickup.cs` + the item `.tres` files): `ItemResource` gained an `[Export] public Texture2D Icon` field, defaulting to `null`. `Pickup._Draw()` draws the icon via `DrawTextureRect` when set, falling back to the original flat-color circle when not -- so items without art assigned yet are still fully functional, just plainer. Every item now has a real icon:
 
 | Item | Sheet region (x, y, 16, 16) | What it is |
 |---|---|---|
@@ -33,6 +33,7 @@ Four sheets, dropped in and organized under `assets/sprites/`. See `assets/ATTRI
 | Leather Armor | `(32, 160)` | Plain gray chestplate, row 10 col 2 |
 | Ruby Ring | `(0, 32)` | Gold ring, red gem, row 2 col 0 |
 | Health Potion | `(144, 80)` | Orange/red potion bottle, row 5 col 9 |
+| Vitality Potion | `(96, 80)` | Clear/white potion bottle, row 5 col 6 |
 
 Also added: a project-wide `rendering/textures/canvas_textures/default_texture_filter=0` (Nearest) setting in `project.godot`, so pixel art renders crisp at the current scale factors instead of blurry/smoothed -- applies automatically to every texture, no per-node filter setting needed.
 

@@ -42,10 +42,20 @@ Copy `resources/patterns/SpreadBurst.tres` or `AimedSniper.tres`. Fields on `Bul
 
 ## Add a new item
 
-1. New `ItemResource` `.tres` (copy any file in `resources/items/`). Fields: `ItemName` (string), `Kind` (`ItemType` enum — `0` = Weapon, `1` = Armor, `2` = Ring, `3` = Consumable, matching declaration order in `ItemResource.cs`), `IconColor`, `Description`.
+1. New `ItemResource` `.tres` (copy any file in `resources/items/`). Fields: `ItemName` (string), `Kind` (`ItemType` enum — `0` = Weapon, `1` = Armor, `2` = Ring, `3` = Consumable, matching declaration order in `ItemResource.cs`), `IconColor`, `Description`, optionally `Icon` (a `Texture2D` — see `docs/art-integration-plan.md` for how the existing items reference `AtlasTexture` regions of the shared item sheet; falls back to a flat `IconColor` circle if left unset).
 2. Instance `scenes/items/Pickup.tscn` in a room scene, set `position` and the exported `Item` field to your new resource.
 
-**Items currently do nothing when picked up beyond occupying an inventory slot.** No equip system, no stat bonuses. That's the next real system to build (see `README.md` Next Steps) — don't assume `ItemResource` fields imply mechanical effects that don't exist yet.
+**Make it usable via the 1-8 hotkeys** by setting three more fields (all on `ItemResource`, default to "does nothing" so existing items are unaffected):
+
+| Field | Meaning |
+|---|---|
+| `Effect` | `ItemEffectType` enum — `0`=None (default; gear like weapons/armor/rings should stay here), `1`=Heal, `2`=BoostMaxHP, `3`=BoostMaxMP, `4`=BoostAttack, `5`=BoostDefense, `6`=BoostSpeed, `7`=BoostDexterity, `8`=BoostVitality, `9`=BoostWisdom. Exact declaration order is in `ItemResource.cs` — check there if adding a new case, don't assume the numbers above stay stable forever. |
+| `EffectAmount` | How much. For `Heal`, an instant restore to `CurrentHealth` (capped at `Stats.MaxHP`, doesn't touch the stat itself). For every `Boost*`, a **permanent** addition to that field on the player's own `StatsResource` — this is RotMG's real "stat increase potion" mechanic, not a temporary buff. |
+| `ConsumedOnUse` | `true` (default) removes the item from its slot after using it, matching how potions work. Set `false` for a reusable item (untested territory — nothing in the codebase does this yet, but the field's there). |
+
+Whoever's holding the item presses the number key matching its slot (1-8, left-to-right/top-to-bottom in the inventory grid) to trigger it — see `Player.UseItemAt()` / `Player._UnhandledInput()`. `HealthPotion.tres` (Heal) and `VitalityPotion.tres` (BoostVitality) are worked examples of both effect shapes.
+
+**Gear (Weapon/Armor/Ring) doesn't do anything yet beyond sitting in inventory and, now, being hotkey-safe** (pressing a number on a `Effect = None` slot just no-ops). Actual equip slots and passive stat bonuses from worn gear are still the next real system to build — see `README.md` Next Steps. Don't assume equipping/wearing an item does anything yet; only the explicit `Effect` mechanism above currently touches player state.
 
 ## Add a new room/scene
 

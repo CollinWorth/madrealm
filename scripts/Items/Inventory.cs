@@ -13,7 +13,7 @@ public class Inventory
 
     private readonly ItemResource[] _slots = new ItemResource[Size];
 
-    public ItemResource GetSlot(int index) => _slots[index];
+    public ItemResource GetSlot(int index) => index >= 0 && index < Size ? _slots[index] : null;
 
     public bool TryAdd(ItemResource item)
     {

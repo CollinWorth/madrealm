@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/World/FloorBackground.cs" id="1_floorscript"]
 [ext_resource type="Script" path="res://scripts/World/Obstacle.cs" id="17_obstacle"]
@@ -18,6 +18,7 @@
 [ext_resource type="Resource" path="res://resources/items/LeatherArmor.tres" id="14_armor"]
 [ext_resource type="Resource" path="res://resources/items/RubyRing.tres" id="15_ringitem"]
 [ext_resource type="Resource" path="res://resources/items/HealthPotion.tres" id="16_potion"]
+[ext_resource type="Resource" path="res://resources/items/VitalityPotion.tres" id="19_vitpotion"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wallH"]
 size = Vector2(1680, 40)
@@ -135,6 +136,10 @@ Item = ExtResource("15_ringitem")
 [node name="PotionPickup" parent="." instance=ExtResource("6_pickup")]
 position = Vector2(-150, 100)
 Item = ExtResource("16_potion")
+
+[node name="VitalityPotionPickup" parent="." instance=ExtResource("6_pickup")]
+position = Vector2(150, 100)
+Item = ExtResource("19_vitpotion")
 
 [node name="PortalToCatacombs" parent="." instance=ExtResource("18_portal")]
 position = Vector2(0, -440)

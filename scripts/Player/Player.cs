@@ -27,6 +27,17 @@ public partial class Player : EntityBase
     private const int SpriteCellHeight = 24;
     private const int SpriteColumn = 5;
 
+    // Index i corresponds to Inventory slot i -- Key1 uses slot 0, ...,
+    // Key8 uses slot 7. Written out explicitly rather than computed
+    // from Key.Key1 + i: Godot's Key enum values aren't guaranteed
+    // contiguous just because the names look sequential, and this is
+    // the kind of assumption that's cheap to avoid entirely.
+    private static readonly Key[] HotkeySlots =
+    {
+        Key.Key1, Key.Key2, Key.Key3, Key.Key4,
+        Key.Key5, Key.Key6, Key.Key7, Key.Key8,
+    };
+
     private Sprite2D _sprite;
     private AtlasTexture _spriteAtlas;
     private float _aimAngle;
@@ -98,6 +109,84 @@ public partial class Player : EntityBase
         HandleMovement();
         HandleAiming();
         HandleShooting((float)delta);
+    }
+
+    // Edge-triggered (Pressed && !Echo), not polled in _PhysicsProcess
+    // like movement -- a potion should fire once per keypress, not
+    // once per physics frame the key happens to still be held.
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event is not InputEventKey keyEvent || !keyEvent.Pressed || keyEvent.Echo)
+            return;
+
+        for (int i = 0; i < HotkeySlots.Length; i++)
+        {
+            if (keyEvent.Keycode == HotkeySlots[i])
+            {
+                UseItemAt(i);
+                return;
+            }
+        }
+    }
+
+    // Public: InventoryUI could also trigger this (e.g. a future
+    // "right-click to use" interaction) without duplicating the
+    // effect-application logic.
+    public void UseItemAt(int slotIndex)
+    {
+        var item = Inventory.GetSlot(slotIndex);
+        if (item == null || item.Effect == ItemEffectType.None)
+            return;
+
+        ApplyItemEffect(item);
+        EventBus.Instance.EmitSignal(EventBus.SignalName.ItemUsed, item.ItemName, slotIndex);
+
+        if (item.ConsumedOnUse)
+        {
+            Inventory.RemoveAt(slotIndex);
+            EventBus.Instance.EmitSignal(EventBus.SignalName.InventoryChanged);
+        }
+    }
+
+    private void ApplyItemEffect(ItemResource item)
+    {
+        switch (item.Effect)
+        {
+            case ItemEffectType.Heal:
+                CurrentHealth = System.Math.Min(Stats.MaxHP, CurrentHealth + item.EffectAmount);
+                OnHealthChanged();
+                return;
+            case ItemEffectType.BoostMaxHP:
+                Stats.MaxHP += item.EffectAmount;
+                CurrentHealth += item.EffectAmount; // grant the new capacity immediately, not just on next heal
+                OnHealthChanged();
+                break;
+            case ItemEffectType.BoostMaxMP:
+                Stats.MaxMP += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostAttack:
+                Stats.Attack += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostDefense:
+                Stats.Defense += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostSpeed:
+                Stats.Speed += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostDexterity:
+                Stats.Dexterity += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostVitality:
+                Stats.Vitality += item.EffectAmount;
+                break;
+            case ItemEffectType.BoostWisdom:
+                Stats.Wisdom += item.EffectAmount;
+                break;
+            default:
+                return;
+        }
+
+        EventBus.Instance.EmitSignal(EventBus.SignalName.PlayerStatsChanged);
     }
 
     private void HandleMovement()

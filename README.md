@@ -12,15 +12,19 @@ and per-system docs live in `docs/`.
 
 ## Status
 
-One playable class (Wizard), one enemy script driven entirely by data
-(4 enemy types across three scenes via different `Stats`/`Pattern`
-resources, several of those patterns reused across different enemy
-archetypes), object-pooled projectiles, a health HUD, an
-item/inventory/pickup loop with a toggleable UI, two connected
-dungeons plus the original test arena, and portals carrying player
-state between scenes.
-No procedural generation, equipment stat bonuses, real art, or
-networking yet -- see *Next steps*.
+One playable class (Wizard) with a real directional sprite, one enemy
+script driven entirely by data (4 enemy types across three scenes via
+different `Stats`/`Pattern` resources, several of those patterns
+reused across different enemy archetypes), object-pooled projectiles,
+a health HUD, an item/inventory/pickup loop with a toggleable UI and
+1-8 hotkeys to use consumables (instant heals and permanent stat
+boosts both supported -- see `docs/content-authoring-guide.md`), two
+connected dungeons plus the original test arena, and portals carrying
+player state between scenes. Item icons and the player sprite use real
+art now; enemies, bullets, and the floor/walls are still flat-colored
+placeholders -- see `docs/art-integration-plan.md`.
+No procedural generation, equipment/gear stat bonuses, or networking
+yet -- see *Next steps*.
 
 **This has been built and played for real**, not just reviewed --
 including finding and fixing several genuine bugs along the way (a
@@ -50,6 +54,9 @@ which I reviewed line-by-line.
 - **Left click (hold)** -- fire, at your class's fire rate (Dexterity-scaled)
 - **I** -- toggle inventory. Click a filled slot to drop that item back
   into the world at your feet.
+- **1-8** -- use the item in that inventory slot (potions etc.), if it
+  has a usable effect. Works anytime, doesn't require the inventory
+  panel to be open.
 
 Controls are read directly via `Input.IsPhysicalKeyPressed` / mouse
 button state rather than Godot's InputMap, to keep the first pass

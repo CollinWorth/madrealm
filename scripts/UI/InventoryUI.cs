@@ -67,7 +67,10 @@ public partial class InventoryUI : CanvasLayer
             else
             {
                 _slots[i].Text = item.ItemName.Length > 3 ? item.ItemName.Substring(0, 3) : item.ItemName;
-                _slots[i].TooltipText = $"{item.ItemName} ({item.Kind})\n{item.Description}\nClick to drop";
+                string hint = item.Effect != ItemEffectType.None
+                    ? $"Press {i + 1} to use, click to drop"
+                    : "Click to drop";
+                _slots[i].TooltipText = $"{item.ItemName} ({item.Kind})\n{item.Description}\n{hint}";
                 _slots[i].Modulate = item.IconColor;
             }
         }

@@ -3,17 +3,17 @@
 [ext_resource type="Script" path="res://scripts/Items/ItemResource.cs" id="1_item"]
 [ext_resource type="Texture2D" path="res://assets/sprites/items/roguelikeitems.png" id="2_sheet"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_healthpotion"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_vitalitypotion"]
 atlas = ExtResource("2_sheet")
-region = Rect2(144, 80, 16, 16)
+region = Rect2(96, 80, 16, 16)
 
 [resource]
 script = ExtResource("1_item")
-ItemName = "Health Potion"
+ItemName = "Vitality Potion"
 Kind = 3
-IconColor = Color(1, 0.2, 0.4, 1)
-Description = "Tastes awful. Works anyway."
-Icon = SubResource("AtlasTexture_healthpotion")
-Effect = 1
-EffectAmount = 30
+IconColor = Color(0.8, 0.95, 0.85, 1)
+Description = "Permanently toughens you. The good kind of potion."
+Icon = SubResource("AtlasTexture_vitalitypotion")
+Effect = 8
+EffectAmount = 1
 ConsumedOnUse = true

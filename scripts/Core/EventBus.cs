@@ -32,4 +32,15 @@ public partial class EventBus : Node
 
     [Signal]
     public delegate void InventoryChangedEventHandler();
+
+    [Signal]
+    public delegate void ItemUsedEventHandler(string itemName, int slotIndex);
+
+    // Fired after any permanent StatsResource change (item boosts,
+    // eventually equipment/leveling). Deliberately parameterless --
+    // listeners just re-read whatever they need from
+    // GameManager.CurrentPlayer.Stats rather than this signal trying
+    // to describe every possible stat change shape up front.
+    [Signal]
+    public delegate void PlayerStatsChangedEventHandler();
 }
