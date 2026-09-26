@@ -1,12 +1,11 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player/PlayerClassData.cs" id="1_class"]
 [ext_resource type="Resource" path="res://resources/stats/WizardStats.tres" id="2_stats"]
+[ext_resource type="Resource" path="res://resources/items/WizardWand.tres" id="3_wand"]
 
 [resource]
 script = ExtResource("1_class")
 ClassName = "Wizard"
 BaseStats = ExtResource("2_stats")
-ProjectileColor = Color(0.4, 0.8, 1, 1)
-ProjectileSpeed = 500.0
-ProjectileLifetime = 1.4
+StartingWeapon = ExtResource("3_wand")

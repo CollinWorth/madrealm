@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/Items/ItemResource.cs" id="1_item"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/Bullet.tscn" id="2_bullet"]
+
+[resource]
+script = ExtResource("1_item")
+ItemName = "Wizard's Wand"
+Kind = 0
+IconColor = Color(0.4, 0.8, 1, 1)
+Description = "Innate to the class. Not much to look at, gets the job done."
+WeaponBulletScene = ExtResource("2_bullet")
+WeaponBulletCount = 1
+WeaponSpreadDegrees = 0.0
+WeaponProjectileSpeed = 500.0
+WeaponProjectileLifetime = 1.4
+WeaponProjectileColor = Color(0.4, 0.8, 1, 1)
+WeaponBaseFireCooldown = 0.6

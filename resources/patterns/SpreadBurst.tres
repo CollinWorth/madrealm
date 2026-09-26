@@ -1,12 +1,15 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/Enemies/BulletPatternResource.cs" id="1_pattern"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/Bullet.tscn" id="2_bullet"]
 
 [resource]
 script = ExtResource("1_pattern")
+BulletScene = ExtResource("2_bullet")
 BulletCount = 5
 SpreadDegrees = 70.0
 BulletSpeed = 220.0
 BulletLifetime = 3.0
 AimAtPlayer = true
 BulletColor = Color(1, 0.3, 0.3, 1)
+FireCooldown = 1.5

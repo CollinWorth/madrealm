@@ -1,4 +1,7 @@
 using Godot;
+using MadRealm.Core;
+using MadRealm.Entities;
+using MadRealm.Projectiles;
 
 namespace MadRealm.Items;
 
@@ -84,4 +87,73 @@ public partial class ItemResource : Resource
     [Export] public int BonusDexterity = 0;
     [Export] public int BonusVitality = 0;
     [Export] public int BonusWisdom = 0;
+
+    // --- Weapon-kind items only: firing is owned entirely by the
+    // weapon itself, not by whoever's holding it. Player.HandleShooting
+    // (or, someday, anything else that ends up wielding a weapon) only
+    // ever asks ReadyToFire() and calls Fire() -- it never spawns
+    // bullets itself or reaches in to compute a cooldown by hand. This
+    // is what lets two weapons feel completely different (spread vs.
+    // single shot, fast vs. slow, small vs. big projectiles) purely
+    // through data, the same way BulletPatternResource already does
+    // for enemies -- see docs/architecture.md for the fuller writeup
+    // of why this split exists and where else it applies.
+    [Export] public PackedScene WeaponBulletScene;
+    [Export] public int WeaponBulletCount = 1;
+    [Export] public float WeaponSpreadDegrees = 0f;
+    [Export] public float WeaponProjectileSpeed = 600f;
+    [Export] public float WeaponProjectileLifetime = 1.2f;
+    [Export] public Color WeaponProjectileColor = Colors.Cyan;
+
+    // Base seconds between shots at Dexterity = 0 -- see
+    // StatsResource.ComputeShotCooldown for how a shooter's Dexterity
+    // turns this into an actual cooldown.
+    [Export] public float WeaponBaseFireCooldown = 0.3f;
+
+    private float _weaponCooldownRemaining;
+
+    public bool ReadyToFire() => _weaponCooldownRemaining <= 0f;
+
+    public void TickCooldown(float delta)
+    {
+        if (_weaponCooldownRemaining > 0f)
+            _weaponCooldownRemaining -= delta;
+    }
+
+    // Fire() itself enforces ReadyToFire() -- returns false and does
+    // nothing if called too early -- rather than trusting every future
+    // caller to remember to check first. Returns whether it actually
+    // fired, so a caller can react (e.g. play a sound only on a real
+    // shot) without duplicating the readiness check.
+    public bool Fire(Vector2 origin, float aimAngle, int damage, Faction team, StatsResource shooterStats)
+    {
+        if (!ReadyToFire() || WeaponBulletScene == null)
+            return false;
+
+        float spreadRad = Mathf.DegToRad(WeaponSpreadDegrees);
+        int count = System.Math.Max(1, WeaponBulletCount);
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = aimAngle;
+            if (count > 1)
+            {
+                // Same centered-slice distribution as EnemyBase's
+                // pattern firing (see that comment for why -- avoids a
+                // seam duplicate on a full-circle spread).
+                float t = (i + 0.5f) / count;
+                angle = aimAngle - spreadRad / 2f + spreadRad * t;
+            }
+
+            var bullet = ObjectPool.Instance.Get<Bullet>(WeaponBulletScene);
+            Vector2 direction = Vector2.Right.Rotated(angle);
+            bullet.Fire(origin, direction, WeaponProjectileSpeed, damage, team, WeaponProjectileColor, WeaponProjectileLifetime);
+        }
+
+        _weaponCooldownRemaining = shooterStats != null
+            ? shooterStats.ComputeShotCooldown(WeaponBaseFireCooldown)
+            : WeaponBaseFireCooldown;
+
+        return true;
+    }
 }

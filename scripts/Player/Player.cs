@@ -2,14 +2,12 @@ using Godot;
 using MadRealm.Core;
 using MadRealm.Entities;
 using MadRealm.Items;
-using MadRealm.Projectiles;
 
 namespace MadRealm.Player;
 
 public partial class Player : EntityBase
 {
 	[Export] public PlayerClassData ClassData;
-	[Export] public PackedScene BulletScene;
 
 	public Inventory Inventory { get; set; } = new Inventory();
 	public Equipment Equipment { get; set; } = new Equipment();
@@ -49,7 +47,6 @@ public partial class Player : EntityBase
 	private Sprite2D _sprite;
 	private AtlasTexture _spriteAtlas;
 	private float _aimAngle;
-	private float _shotTimer;
 
 	public override void _Ready()
 	{
@@ -88,6 +85,17 @@ public partial class Player : EntityBase
 			GameManager.Instance.PendingHealth = -1;
 			GameManager.Instance.PendingInventory = null;
 			GameManager.Instance.PendingEquipment = null;
+		}
+
+		// Fresh spawn with nothing equipped yet: the class's innate
+		// weapon goes straight into the Weapon slot, not the inventory
+		// -- a class that can attack should never start unable to fire.
+		// Duplicated for the same reason equip-from-inventory duplicates
+		// (see EquipFromInventory): this is about to become live,
+		// per-player cooldown-timer state.
+		if (!arrivedViaPortal && Equipment.Weapon == null && ClassData?.StartingWeapon != null)
+		{
+			Equipment.SetSlot(ItemType.Weapon, (ItemResource)ClassData.StartingWeapon.Duplicate());
 		}
 
 		CollisionLayer = LayerPlayer;
@@ -238,12 +246,23 @@ public partial class Player : EntityBase
 		if (newItem.Kind != ItemType.Weapon && newItem.Kind != ItemType.Armor && newItem.Kind != ItemType.Ring)
 			return;
 
-		var previousItem = Equipment.GetSlot(newItem.Kind);
+		// Duplicate on equip, not just for weapons specifically -- gear
+		// .tres files are shared/cached by Godot's resource loader
+		// (every pickup pointing at the same .tres path is the *same*
+		// object in memory), and equipping is the moment an item starts
+		// carrying live, per-player state (a weapon's fire cooldown
+		// today; any future armor/ring mechanic with its own runtime
+		// state gets this for free too). Skipping this would mean two
+		// different pickups of "the same" item could end up silently
+		// sharing one cooldown clock.
+		var equippedItem = (ItemResource)newItem.Duplicate();
+
+		var previousItem = Equipment.GetSlot(equippedItem.Kind);
 		if (previousItem != null)
 			RemoveGearBonus(previousItem);
 
-		Equipment.SetSlot(newItem.Kind, newItem);
-		ApplyGearBonus(newItem);
+		Equipment.SetSlot(equippedItem.Kind, equippedItem);
+		ApplyGearBonus(equippedItem);
 
 		Inventory.SetSlot(inventorySlotIndex, previousItem);
 
@@ -332,31 +351,24 @@ public partial class Player : EntityBase
 		}
 	}
 
+	// Player no longer spawns bullets or tracks a fire-rate timer
+	// itself -- both live on the equipped weapon (ItemResource.Fire()/
+	// ReadyToFire()). This is just: tick the weapon's cooldown, and if
+	// the trigger's held and the weapon says it's ready, tell it to
+	// fire. Two different weapons (spread vs. single shot, fast vs.
+	// slow) now behave completely differently with zero changes here.
 	private void HandleShooting(float delta)
 	{
-		_shotTimer -= delta;
-		if (_shotTimer > 0f)
+		var weapon = Equipment.Weapon;
+		if (weapon == null)
 			return;
 
-		if (Input.IsMouseButtonPressed(MouseButton.Left))
+		weapon.TickCooldown(delta);
+
+		if (Input.IsMouseButtonPressed(MouseButton.Left) && weapon.ReadyToFire())
 		{
-			Fire();
-			_shotTimer = Stats.ShotCooldown;
+			weapon.Fire(GlobalPosition, _aimAngle, Stats.Attack, Faction.Player, Stats);
 		}
-	}
-
-	private void Fire()
-	{
-		if (BulletScene == null)
-			return;
-
-		var bullet = ObjectPool.Instance.Get<Bullet>(BulletScene);
-		Vector2 direction = Vector2.Right.Rotated(_aimAngle);
-		Color color = ClassData?.ProjectileColor ?? Colors.Cyan;
-		float speed = ClassData?.ProjectileSpeed ?? 600f;
-		float lifetime = ClassData?.ProjectileLifetime ?? 1.2f;
-
-		bullet.Fire(GlobalPosition, direction, speed, Stats.Attack, Faction.Player, color, lifetime);
 	}
 
 	protected override void OnHealthChanged()

@@ -1,7 +1,6 @@
 using Godot;
 using MadRealm.Core;
 using MadRealm.Entities;
-using MadRealm.Projectiles;
 
 namespace MadRealm.Enemies;
 
@@ -13,16 +12,12 @@ namespace MadRealm.Enemies;
 // simple distance check genuinely can't express.
 public partial class EnemyBase : EntityBase
 {
-	[Export] public PackedScene BulletScene;
 	[Export] public BulletPatternResource Pattern;
 	[Export] public float AggroRange = 300f;
 	[Export] public float AttackRange = 220f;
-	[Export] public float FireCooldown = 1.5f;
 
 	private const uint LayerWorld = 1 << 0;
 	private const uint LayerEnemy = 1 << 2;
-
-	private float _fireTimer;
 
 	public override void _Ready()
 	{
@@ -32,7 +27,16 @@ public partial class EnemyBase : EntityBase
 		CollisionLayer = LayerEnemy;
 		CollisionMask = LayerWorld;
 
-		_fireTimer = FireCooldown;
+		// Same reasoning as Player.EquipFromInventory duplicating gear:
+		// Godot caches/shares Resources loaded from the same .tres path,
+		// and multiple enemies in a room routinely point at the same
+		// pattern (e.g. two Swarmers both using SpreadBurst.tres).
+		// Pattern now carries live per-shooter cooldown state, so
+		// without duplicating it here those enemies would share one
+		// fire-rate clock and silently starve each other.
+		if (Pattern != null)
+			Pattern = (BulletPatternResource)Pattern.Duplicate();
+
 		QueueRedraw();
 	}
 
@@ -70,48 +74,18 @@ public partial class EnemyBase : EntityBase
 		MoveAndSlide();
 	}
 
+	// EnemyBase no longer tracks a fire-rate timer or spawns bullets
+	// itself -- both live on Pattern (BulletPatternResource.Fire()/
+	// ReadyToFire()), same split as Player/ItemResource. This is just:
+	// tick the pattern's cooldown, and if it's ready, tell it to fire.
 	private void HandleFiring(Vector2 targetPosition, float delta)
 	{
-		if (Pattern == null || BulletScene == null)
+		if (Pattern == null)
 			return;
 
-		_fireTimer -= delta;
-		if (_fireTimer > 0f)
-			return;
+		Pattern.TickCooldown(delta);
 
-		FirePattern(targetPosition);
-		_fireTimer = FireCooldown;
-	}
-
-	private void FirePattern(Vector2 targetPosition)
-	{
-		Vector2 baseDirection = Pattern.AimAtPlayer
-			? (targetPosition - GlobalPosition).Normalized()
-			: Vector2.Right.Rotated(Rotation);
-
-		float baseAngle = baseDirection.Angle();
-		float spreadRad = Mathf.DegToRad(Pattern.SpreadDegrees);
-		int count = System.Math.Max(1, Pattern.BulletCount);
-
-		for (int i = 0; i < count; i++)
-		{
-			float angle = baseAngle;
-			if (count > 1)
-			{
-				// Center each bullet within its own equal slice of the
-				// total spread (rather than spacing by count - 1,
-				// which puts a bullet on each extreme edge). That
-				// alternative breaks for a full 360-degree ring
-				// specifically: the first and last bullets would both
-				// land exactly on the seam, firing two bullets in the
-				// same direction instead of evenly spacing all of them.
-				float t = (i + 0.5f) / count;
-				angle = baseAngle - spreadRad / 2f + spreadRad * t;
-			}
-
-			var bullet = ObjectPool.Instance.Get<Bullet>(BulletScene);
-			Vector2 direction = Vector2.Right.Rotated(angle);
-			bullet.Fire(GlobalPosition, direction, Pattern.BulletSpeed, Stats.Attack, Faction.Enemy, Pattern.BulletColor, Pattern.BulletLifetime);
-		}
+		if (Pattern.ReadyToFire())
+			Pattern.Fire(GlobalPosition, targetPosition, Rotation, Stats.Attack, Faction.Enemy);
 	}
 }
