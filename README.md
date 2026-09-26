@@ -5,19 +5,30 @@ dodge-focused combat, an 8-stat character system, data-driven enemy
 bullet patterns, permadeath as the eventual target. Built in **Godot
 4.7 (C#/.NET 8)**.
 
+**Working on this codebase (human or AI)?** Read `CLAUDE.md` first --
+it's the short, load-bearing rules this project follows and the
+mistakes already made once that don't need repeating. Deeper reasoning
+and per-system docs live in `docs/`.
+
 ## Status
 
 One playable class (Wizard), one enemy script driven entirely by data
-(4 enemy types across two scenes via different `Stats`/`Pattern`
-resources), object-pooled projectiles, a health HUD, a basic
-item/inventory/pickup loop with a toggleable UI, and a proper dungeon
-room alongside the original test arena. No procedural generation,
-equipment stat bonuses, or networking yet -- see *Next steps*.
+(4 enemy types across three scenes via different `Stats`/`Pattern`
+resources, several of those patterns reused across different enemy
+archetypes), object-pooled projectiles, a health HUD, an
+item/inventory/pickup loop with a toggleable UI, two connected
+dungeons plus the original test arena, and portals carrying player
+state between scenes.
+No procedural generation, equipment stat bonuses, real art, or
+networking yet -- see *Next steps*.
 
-**I could not run or compile this locally** -- this machine has neither
-Godot nor the .NET SDK installed, so treat this as carefully
-hand-written but *unverified*. Open it in the editor and hit F5; if
-anything doesn't compile, most likely culprits are typos in the
+**This has been built and played for real**, not just reviewed --
+including finding and fixing several genuine bugs along the way (a
+real C# compile error, invisible collision geometry, cross-branch
+z-index rendering issues). See `docs/godot-csharp-gotchas.md` for the
+specifics if you're extending this codebase and want to avoid repeating
+them. If anything doesn't compile after a change, most likely culprits
+are typos in the
 `.tscn` files (hand-authored scene text) rather than the C# itself,
 which I reviewed line-by-line.
 
