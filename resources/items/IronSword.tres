@@ -1,7 +1,7 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ItemResource" format=3 uid="uid://b4mm7steloq67"]
 
-[ext_resource type="Script" path="res://scripts/Items/ItemResource.cs" id="1_item"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/roguelikeitems.png" id="2_sheet"]
+[ext_resource type="Script" uid="uid://b71vud70ibi0m" path="res://scripts/Items/ItemResource.cs" id="1_item"]
+[ext_resource type="Texture2D" uid="uid://bcpuf24hheg1n" path="res://assets/sprites/items/roguelikeitems.png" id="2_sheet"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ironsword"]
 atlas = ExtResource("2_sheet")

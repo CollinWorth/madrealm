@@ -1,14 +1,13 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="StatsResource" format=3 uid="uid://b4pkowle6scq8"]
 
-[ext_resource type="Script" path="res://scripts/Entities/StatsResource.cs" id="1_stats"]
+[ext_resource type="Script" uid="uid://uaq1u1rairc" path="res://scripts/Entities/StatsResource.cs" id="1_stats"]
 
 [resource]
 script = ExtResource("1_stats")
 MaxHP = 60
-MaxMP = 100
 Attack = 20
 Defense = 2
-Speed = 8
+Speed = 20
 Dexterity = 6
 Vitality = 8
 Wisdom = 15
