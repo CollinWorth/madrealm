@@ -15,6 +15,12 @@ public partial class Pickup : Area2D
 
     public override void _Ready()
     {
+        // Absolute z-index, same layer as entities -- see the comment
+        // on EntityBase._Ready() / FloorBackground for why this needs
+        // to be explicit rather than left at the relative default.
+        ZIndex = 0;
+        ZAsRelative = false;
+
         CollisionLayer = 0;
         CollisionMask = LayerPlayer;
         BodyEntered += OnBodyEntered;

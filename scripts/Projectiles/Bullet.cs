@@ -27,6 +27,15 @@ public partial class Bullet : Area2D
 
     public override void _Ready()
     {
+        // Absolute z-index, deliberately above entities (0) and the
+        // floor (-100): bullets are pooled under the ObjectPool
+        // autoload, a different tree branch than the room/entities
+        // entirely, and are the thing you most need to see clearly to
+        // dodge, so they get explicit top priority rather than
+        // whatever tree-order happened to fall out of that split.
+        ZIndex = 5;
+        ZAsRelative = false;
+
         _lifetimeTimer = GetNode<Timer>("Lifetime");
         _lifetimeTimer.Timeout += Despawn;
         BodyEntered += OnBodyEntered;

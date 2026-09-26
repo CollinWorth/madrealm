@@ -30,6 +30,12 @@ public partial class EntityBase : CharacterBody2D
 
     public override void _Ready()
     {
+        // Absolute, not relative-to-parent -- guarantees Player/enemies
+        // sit above the floor (-100) regardless of where in the tree
+        // they live, same reasoning as FloorBackground.
+        ZIndex = 0;
+        ZAsRelative = false;
+
         if (Stats == null)
         {
             GD.PushWarning($"{Name} has no Stats resource assigned; using fallback defaults.");
